@@ -5,8 +5,7 @@ from fastapi import Depends, APIRouter, Form, status
 
 from api.api_v1.movies_api.crud import MOVIES
 from api.api_v1.movies_api.dependencies import prefetch_movie
-from schemas.movie import Movie
-
+from schemas.movie import Movie, MovieCreate
 
 router = APIRouter(
     prefix="/movies",
@@ -27,22 +26,15 @@ def read_movies():
     response_model=Movie,
     status_code=status.HTTP_201_CREATED,
 )
-def create_movie(
-    title: Annotated[str, Form()],
-    year: Annotated[int, Form()],
-    description: Annotated[str, Form()],
-):
-    return Movie(
-        movie_id=random.randint(len(MOVIES), 99),
-        title=title,
-        year=year,
-        description=description,
-    )
+def create_movie(movie_create: MovieCreate):
+    return Movie(**movie_create.model_dump())
 
 
 @router.get(
-    "/{movie-id}",
+    "/{slug}",
     response_model=Movie,
 )
-def get_movie_by_id(movie: Annotated[Movie, Depends(prefetch_movie)]) -> Movie:
+def get_movie_by_id(
+    movie: Annotated[Movie, Depends(prefetch_movie)],
+) -> Movie:
     return movie
