@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import Depends, APIRouter, status
 
-from api.api_v1.movies_api.crud import MOVIES
+from api.api_v1.movies_api.crud import movie_storage
 from api.api_v1.movies_api.dependencies import prefetch_movie
 from schemas.movie import Movie, MovieCreate
 
@@ -17,7 +17,7 @@ router = APIRouter(
     response_model=list[Movie],
 )
 def read_movies():
-    return MOVIES
+    return movie_storage.get()
 
 
 @router.post(
@@ -26,7 +26,8 @@ def read_movies():
     status_code=status.HTTP_201_CREATED,
 )
 def create_movie(movie_create: MovieCreate):
-    return Movie(**movie_create.model_dump())
+    movie = movie_storage.create_movie(movie_create)
+    return movie
 
 
 @router.get(
