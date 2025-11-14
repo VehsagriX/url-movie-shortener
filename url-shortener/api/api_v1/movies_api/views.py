@@ -1,7 +1,6 @@
-import random
 from typing import Annotated
 
-from fastapi import Depends, APIRouter, Form, status
+from fastapi import Depends, APIRouter, status
 
 from api.api_v1.movies_api.crud import MOVIES
 from api.api_v1.movies_api.dependencies import prefetch_movie
