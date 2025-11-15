@@ -31,10 +31,36 @@ def create_movie(movie_create: MovieCreate):
 
 
 @router.get(
-    "/{slug}",
+    "/{slug}/",
     response_model=Movie,
 )
 def get_movie_by_id(
     movie: Annotated[Movie, Depends(prefetch_movie)],
 ) -> Movie:
     return movie
+
+
+@router.delete(
+    "/{slug}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "description": "Movie not found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Movie by 'slug' not found",
+                    }
+                }
+            },
+        }
+    },
+)
+def delete_movie(
+    movie: Annotated[Movie, Depends(prefetch_movie)],
+) -> None:
+    """При удалении описали дополнительную информацию в документации в responses.
+    Статус код при удалении status.HTTP_204_NO_CONTENT!!!
+    """
+
+    movie_storage.delete_movie(movie)

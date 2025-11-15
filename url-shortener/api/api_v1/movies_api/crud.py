@@ -31,12 +31,18 @@ class Storage(BaseModel):
         return self.storage_movie.values()
 
     def get_movie_by_slug(self, slug):
-        return self.storage_movie[slug]
+        return self.storage_movie.get(slug)
 
     def create_movie(self, movie_create: MovieCreate):
         movie = Movie(**movie_create.model_dump())
         self.storage_movie[movie.slug] = movie
         return movie
+
+    def delete_movie_by_slug(self, slug) -> None:
+        self.storage_movie.pop(slug)
+
+    def delete_movie(self, movie: Movie) -> None:
+        self.delete_movie_by_slug(movie.slug)
 
 
 movie_storage = Storage()
