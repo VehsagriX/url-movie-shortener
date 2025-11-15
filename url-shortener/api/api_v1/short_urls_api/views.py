@@ -28,6 +28,7 @@ def read_short_urls_list() -> list[ShortUrl]:
     status_code=status.HTTP_201_CREATED,
 )
 def create_short_url(short_url_create: ShortUrlCreate) -> ShortUrl:
+    """При создании данных апи возвращает 201 статус код!!!"""
     return storage.create(short_url_create)
 
 
@@ -39,3 +40,30 @@ def get_short_url_by_slug(
     ],
 ) -> ShortUrl:
     return url
+
+
+@router.delete(
+    "/{slug}/",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        # status.HTTP_204_NO_CONTENT: None,
+        status.HTTP_404_NOT_FOUND: {
+            "description": "URL not found",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "URL 'slug' not found",
+                    }
+                }
+            },
+        },
+    },
+)
+def delete_short_url(
+    url: Annotated[
+        ShortUrl,
+        Depends(prefetch_short_url),
+    ],
+) -> None:
+    """При удалении данных апи возвращает 204 статус код!!!"""
+    storage.delete(url)
