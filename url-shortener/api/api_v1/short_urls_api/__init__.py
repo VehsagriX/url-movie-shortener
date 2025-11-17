@@ -2,4 +2,4 @@ __all__ = [
     "router",
 ]
 
-from .url_views import router
+from api.api_v1.short_urls_api.url_views import router
