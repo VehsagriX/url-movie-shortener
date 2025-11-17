@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from schemas.movie import Movie, MovieCreate
+from schemas.movie import Movie, MovieCreate, MovieUpdate
 
 MOVIES = [
     Movie(
@@ -43,6 +43,11 @@ class Storage(BaseModel):
 
     def delete_movie(self, movie: Movie) -> None:
         self.delete_movie_by_slug(movie.slug)
+
+    def update(self, movie: Movie, movie_in: MovieUpdate) -> Movie:
+        for field_name, value in movie_in:
+            setattr(movie, field_name, value)
+        return movie
 
 
 movie_storage = Storage()

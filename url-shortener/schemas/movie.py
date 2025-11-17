@@ -18,5 +18,11 @@ class MovieCreate(MovieBase):
     description: str | None
 
 
+class MovieUpdate(BaseModel):
+    title: Annotated[str, Len(5, 30)]
+    description: str
+    year: int
+
+
 class Movie(MovieBase):
     pass

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from api.api_v1.movies_api.crud import movie_storage
 from api.api_v1.movies_api.dependencies import prefetch_movie
-from schemas.movie import Movie
+from schemas.movie import Movie, MovieUpdate
 
 router = APIRouter(
     prefix="/{slug}",
@@ -22,13 +22,15 @@ router = APIRouter(
     },
 )
 
+MovieBySlug = Annotated[Movie, Depends(prefetch_movie)]
+
 
 @router.get(
     "/",
     response_model=Movie,
 )
 def get_movie_by_id(
-    movie: Annotated[Movie, Depends(prefetch_movie)],
+    movie: MovieBySlug,
 ) -> Movie:
     return movie
 
@@ -38,10 +40,18 @@ def get_movie_by_id(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_movie(
-    movie: Annotated[Movie, Depends(prefetch_movie)],
+    movie: MovieBySlug,
 ) -> None:
     """При удалении описали дополнительную информацию в документации в responses.
     Статус код при удалении status.HTTP_204_NO_CONTENT!!!
     """
 
     movie_storage.delete_movie(movie)
+
+
+@router.put("/", response_model=Movie)
+def update_movie_by_slug(
+    movie: MovieBySlug,
+    movie_in: MovieUpdate,
+):
+    return movie_storage.update(movie, movie_in)
