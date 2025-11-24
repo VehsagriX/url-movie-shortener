@@ -14,6 +14,10 @@ class MovieBase(BaseModel):
 
 
 class MovieCreate(MovieBase):
+    """
+    Модель создания Фильма
+    """
+
     slug: Annotated[str, Len(3 - 10)]
     title: TitleAnnotated
     year: int
@@ -21,14 +25,26 @@ class MovieCreate(MovieBase):
 
 
 class MovieUpdate(MovieBase):
+    """
+    Модель обновления Фильма
+    """
+
     title: TitleAnnotated
 
 
 class MovieUpdatePartial(MovieBase):
+    """
+    Модель частичного обновления фильма
+    """
+
     title: TitleAnnotated | None = None
     description: str | None = None
     year: int | None = None
 
 
 class Movie(MovieBase):
+    """
+    Модель представления Фильма
+    """
+
     slug: str
