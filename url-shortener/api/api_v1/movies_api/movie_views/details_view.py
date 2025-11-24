@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from api.api_v1.movies_api.crud import movie_storage
 from api.api_v1.movies_api.dependencies import prefetch_movie
-from schemas.movie import Movie, MovieUpdate
+from schemas.movie import Movie, MovieUpdate, MovieUpdatePartial
 
 router = APIRouter(
     prefix="/{slug}",
@@ -55,3 +55,11 @@ def update_movie_by_slug(
     movie_in: MovieUpdate,
 ):
     return movie_storage.update(movie, movie_in)
+
+
+@router.patch("/", response_model=Movie)
+def update_movie_by_slug_partial(
+    movie: MovieBySlug,
+    movie_in: MovieUpdatePartial,
+):
+    return movie_storage.update_partial(movie=movie, movie_in=movie_in)

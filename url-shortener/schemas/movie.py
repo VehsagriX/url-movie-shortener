@@ -3,9 +3,11 @@ from typing import Annotated
 from annotated_types import Len
 from pydantic import BaseModel
 
+TitleAnnotated = Annotated[str, Len(5, 30)]
+
 
 class MovieBase(BaseModel):
-    slug: str
+
     title: str
     description: str
     year: int
@@ -13,16 +15,20 @@ class MovieBase(BaseModel):
 
 class MovieCreate(MovieBase):
     slug: Annotated[str, Len(3 - 10)]
-    title: Annotated[str, Len(5, 30)]
+    title: TitleAnnotated
     year: int
     description: str | None
 
 
-class MovieUpdate(BaseModel):
-    title: Annotated[str, Len(5, 30)]
-    description: str
-    year: int
+class MovieUpdate(MovieBase):
+    title: TitleAnnotated
+
+
+class MovieUpdatePartial(MovieBase):
+    title: TitleAnnotated | None = None
+    description: str | None = None
+    year: int | None = None
 
 
 class Movie(MovieBase):
-    pass
+    slug: str
