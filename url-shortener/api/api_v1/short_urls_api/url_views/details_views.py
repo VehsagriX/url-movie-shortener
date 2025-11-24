@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from api.api_v1.short_urls_api.crud import storage
 from api.api_v1.short_urls_api.dependencies import prefetch_short_url
-from schemas.short_url import ShortUrl, ShortUrlUpdate
+from schemas.short_url import ShortUrl, ShortUrlUpdate, ShortUrlUpdatePartial
 
 router = APIRouter(
     prefix="/{slug}",
@@ -46,3 +46,11 @@ def update_short_url_details(
     short_url_in: ShortUrlUpdate,
 ):
     return storage.update(short_url=url, short_url_in=short_url_in)
+
+
+@router.patch("/", response_model=ShortUrl)
+def update_short_url_details_partial(
+    url: ShortUrlBySlug,
+    short_url_in: ShortUrlUpdatePartial,
+):
+    return storage.update_partial(short_url=url, short_url_in=short_url_in)

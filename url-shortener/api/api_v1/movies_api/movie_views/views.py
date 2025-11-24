@@ -1,8 +1,7 @@
 from fastapi import status, APIRouter
 
 from api.api_v1.movies_api.crud import movie_storage
-from schemas.movie import Movie, MovieCreate
-
+from schemas.movie import Movie, MovieCreate, MovieUpdate
 
 router = APIRouter(
     prefix="/movies",
