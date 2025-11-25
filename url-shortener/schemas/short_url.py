@@ -28,6 +28,12 @@ class ShortUrlUpdatePartial(ShortUrlBase):
     description: DescriptionAnnotated | None = None
 
 
+class ShortUrlRead(ShortUrlBase):
+    """Модель для чтения данных по ссылке."""
+
+    slug: str
+
+
 class ShortUrlUpdate(ShortUrlBase):
     """
     Модель обновления ссылки
@@ -42,3 +48,4 @@ class ShortUrl(ShortUrlBase):
     """
 
     slug: str
+    visit: int = 5

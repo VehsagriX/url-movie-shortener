@@ -4,7 +4,12 @@ from fastapi import APIRouter, Depends, status
 
 from api.api_v1.short_urls_api.crud import storage
 from api.api_v1.short_urls_api.dependencies import prefetch_short_url
-from schemas.short_url import ShortUrl, ShortUrlUpdate, ShortUrlUpdatePartial
+from schemas.short_url import (
+    ShortUrl,
+    ShortUrlUpdate,
+    ShortUrlUpdatePartial,
+    ShortUrlRead,
+)
 
 router = APIRouter(
     prefix="/{slug}",
@@ -26,7 +31,7 @@ router = APIRouter(
 ShortUrlBySlug = Annotated[ShortUrl, Depends(prefetch_short_url)]
 
 
-@router.get("/", response_model=ShortUrl)
+@router.get("/", response_model=ShortUrlRead)
 def get_short_url_by_slug(url: ShortUrlBySlug) -> ShortUrl:
     return url
 
@@ -40,7 +45,7 @@ def delete_short_url(url: ShortUrlBySlug) -> None:
     storage.delete(url)
 
 
-@router.put("/", response_model=ShortUrl)
+@router.put("/", response_model=ShortUrlRead)
 def update_short_url_details(
     url: ShortUrlBySlug,
     short_url_in: ShortUrlUpdate,
@@ -48,7 +53,7 @@ def update_short_url_details(
     return storage.update(short_url=url, short_url_in=short_url_in)
 
 
-@router.patch("/", response_model=ShortUrl)
+@router.patch("/", response_model=ShortUrlRead)
 def update_short_url_details_partial(
     url: ShortUrlBySlug,
     short_url_in: ShortUrlUpdatePartial,
