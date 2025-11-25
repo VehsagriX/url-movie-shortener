@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 
 from api.api_v1.movies_api.crud import movie_storage
 from api.api_v1.movies_api.dependencies import prefetch_movie
-from schemas.movie import Movie, MovieUpdate, MovieUpdatePartial
+from schemas.movie import Movie, MovieUpdate, MovieUpdatePartial, MovieRead
 
 router = APIRouter(
     prefix="/{slug}",
@@ -27,7 +27,7 @@ MovieBySlug = Annotated[Movie, Depends(prefetch_movie)]
 
 @router.get(
     "/",
-    response_model=Movie,
+    response_model=MovieRead,
 )
 def get_movie_by_id(
     movie: MovieBySlug,
@@ -49,17 +49,17 @@ def delete_movie(
     movie_storage.delete_movie(movie)
 
 
-@router.put("/", response_model=Movie)
+@router.put("/", response_model=MovieRead)
 def update_movie_by_slug(
     movie: MovieBySlug,
     movie_in: MovieUpdate,
-):
+) -> Movie:
     return movie_storage.update(movie, movie_in)
 
 
-@router.patch("/", response_model=Movie)
+@router.patch("/", response_model=MovieRead)
 def update_movie_by_slug_partial(
     movie: MovieBySlug,
     movie_in: MovieUpdatePartial,
-):
+) -> Movie:
     return movie_storage.update_partial(movie=movie, movie_in=movie_in)

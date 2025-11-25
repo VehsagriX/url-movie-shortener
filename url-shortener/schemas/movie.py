@@ -42,9 +42,14 @@ class MovieUpdatePartial(MovieBase):
     year: int | None = None
 
 
+class MovieRead(MovieBase):
+    pass
+
+
 class Movie(MovieBase):
     """
     Модель представления Фильма
     """
 
     slug: str
+    notes: str = "Admin comments"
