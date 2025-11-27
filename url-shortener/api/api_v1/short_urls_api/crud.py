@@ -61,17 +61,17 @@ try:
     storage = ShortUrlsStorage().from_state()
 except ValidationError:
     storage = ShortUrlsStorage()
+    storage.save_state()  # Если файл битый, то уже перезаписываем файл по данному состоянию
 
-
-storage.create(
-    ShortUrlCreate(
-        target_url=AnyHttpUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
-        slug="Youtube",
-    ),
-)
-storage.create(
-    ShortUrlCreate(
-        target_url=AnyHttpUrl("https://google.com"),
-        slug="Google",
-    ),
-)
+# storage.create(
+#     ShortUrlCreate(
+#         target_url=AnyHttpUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+#         slug="Youtube",
+#     ),
+# )
+# storage.create(
+#     ShortUrlCreate(
+#         target_url=AnyHttpUrl("https://google.com"),
+#         slug="Google",
+#     ),
+# )

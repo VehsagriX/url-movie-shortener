@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-
+from pydantic import BaseModel, ValidationError
+from core.config import MOVIE_STORAGE_FILEPATH
 from schemas.movie import Movie, MovieCreate, MovieUpdate, MovieUpdatePartial
 
 MOVIES = [
@@ -27,6 +27,15 @@ MOVIES = [
 class Storage(BaseModel):
     storage_movie: dict[str, Movie] = {}
 
+    def save_state(self):
+        MOVIE_STORAGE_FILEPATH.write_text(self.model_dump_json(indent=2))
+
+    @classmethod
+    def from_state(cls) -> "Storage":
+        if not MOVIE_STORAGE_FILEPATH.exists():
+            return Storage()
+        return cls.model_validate(MOVIE_STORAGE_FILEPATH.read_text())
+
     def get(self):
         return self.storage_movie.values()
 
@@ -36,10 +45,12 @@ class Storage(BaseModel):
     def create_movie(self, movie_create: MovieCreate):
         movie = Movie(**movie_create.model_dump())
         self.storage_movie[movie.slug] = movie
+        self.save_state()
         return movie
 
     def delete_movie_by_slug(self, slug) -> None:
         self.storage_movie.pop(slug)
+        self.save_state()
 
     def delete_movie(self, movie: Movie) -> None:
         self.delete_movie_by_slug(movie.slug)
@@ -47,38 +58,47 @@ class Storage(BaseModel):
     def update(self, movie: Movie, movie_in: MovieUpdate) -> Movie:
         for field_name, value in movie_in:
             setattr(movie, field_name, value)
+        self.save_state()
         return movie
 
     def update_partial(self, movie: Movie, movie_in: MovieUpdatePartial) -> Movie:
         for field_name, value in movie_in.model_dump(exclude_unset=True).items():
             setattr(movie, field_name, value)
+        self.save_state()
         return movie
 
 
-movie_storage = Storage()
-movie_storage.create_movie(
-    MovieCreate(
-        slug="one",
-        title="Movie 1",
-        year=1999,
-        description="Movie blablabla",
-    ),
-)
+try:
+    movie_storage = Storage.from_state()
+except ValidationError:
+    movie_storage = Storage()
+    movie_storage.save_state()
 
-movie_storage.create_movie(
-    MovieCreate(
-        slug="two",
-        title="Movie 2",
-        year=2000,
-        description="Movie abcsdsa",
-    ),
-)
 
-movie_storage.create_movie(
-    MovieCreate(
-        slug="three",
-        title="Movie 3",
-        year=2010,
-        description="Movie asdla;sdkxadasx asdkasld;as",
-    ),
-)
+# movie_storage = Storage()
+# movie_storage.create_movie(
+#     MovieCreate(
+#         slug="one",
+#         title="Movie 1",
+#         year=1999,
+#         description="Movie blablabla",
+#     ),
+# )
+#
+# movie_storage.create_movie(
+#     MovieCreate(
+#         slug="two",
+#         title="Movie 2",
+#         year=2000,
+#         description="Movie abcsdsa",
+#     ),
+# )
+#
+# movie_storage.create_movie(
+#     MovieCreate(
+#         slug="three",
+#         title="Movie 3",
+#         year=2010,
+#         description="Movie asdla;sdkxadasx asdkasld;as",
+#     ),
+# )
