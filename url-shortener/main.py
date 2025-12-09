@@ -6,6 +6,7 @@ from fastapi import (
 )
 
 from api import router as api_router
+from app_lifespan import lifespan
 from core.config import LOG_FORMAT, LOG_LVL
 
 logging.basicConfig(
@@ -19,6 +20,7 @@ logging.basicConfig(
 
 app = FastAPI(
     title="URL, Movie Shortener",
+    lifespan=lifespan,
 )
 app.include_router(api_router)
 

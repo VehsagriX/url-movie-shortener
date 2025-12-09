@@ -42,6 +42,19 @@ class Storage(BaseModel):
             return Storage()
         return cls.model_validate(MOVIE_STORAGE_FILEPATH.read_text())
 
+    def init_movie_state(self) -> None:
+        try:
+            movie_data = Storage.from_state()
+            log.warning("Movie storage loaded successfully")
+        except ValidationError:
+            movie_storage.save_state()
+            log.warning("Movie storage could not be loaded, but we rewriting it")
+            return
+
+        self.storage_movie.update(
+            movie_data.storage_movie,
+        )
+
     def get(self):
         return self.storage_movie.values()
 
@@ -76,13 +89,7 @@ class Storage(BaseModel):
         return movie
 
 
-try:
-    movie_storage = Storage.from_state()
-    log.warning("Movie storage loaded successfully")
-except ValidationError:
-    log.warning("Movie storage could not be loaded, but we rewriting it")
-    movie_storage = Storage()
-    movie_storage.save_state()
+movie_storage = Storage()
 
 
 # movie_storage = Storage()
