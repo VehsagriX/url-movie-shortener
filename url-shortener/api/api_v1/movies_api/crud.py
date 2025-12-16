@@ -45,7 +45,6 @@ class MovieStorage(BaseModel):
         movie = Movie(**movie_create.model_dump())
         self.storage_movie[movie.slug] = movie
         log.info("Created Movie %s", movie.title)
-        self.save_state()
 
         return movie
 
