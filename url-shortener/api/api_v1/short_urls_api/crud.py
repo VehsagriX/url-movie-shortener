@@ -1,6 +1,6 @@
 import logging
 
-from pydantic import AnyHttpUrl, BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError
 
 from core.config import SHORT_URL_STORAGE_FILEPATH
 from schemas.short_url import (
@@ -31,6 +31,7 @@ class ShortUrlsStorage(BaseModel):
     def init_url_storage_from_state(self) -> None:
         try:
             data = ShortUrlsStorage().from_state()
+            log.info("ShortUrlsStorage loaded from state.")
         except ValidationError:
             self.save_state()
             log.warning("Rewriting shorturl storage file. Validation error.")
@@ -51,7 +52,7 @@ class ShortUrlsStorage(BaseModel):
             **short_url_create.model_dump(),
         )
         self.slug_to_short_url[short_url.slug] = short_url
-        self.save_state()
+        log.info("Created shorturl")
         return short_url
 
     def delete_by_slug(self, slug) -> None:

@@ -7,29 +7,8 @@ from schemas.movie import Movie, MovieCreate, MovieUpdate, MovieUpdatePartial
 
 log = logging.getLogger(__name__)
 
-MOVIES = [
-    Movie(
-        slug="one",
-        title="Movie 1",
-        year=1999,
-        description="Movie blablabla",
-    ),
-    Movie(
-        slug="two",
-        title="Movie 2",
-        year=2000,
-        description="Movie abcsdsa",
-    ),
-    Movie(
-        slug="three",
-        title="Movie 3",
-        year=2010,
-        description="Movie asdla;sdkxadasx asdkasld;as",
-    ),
-]
 
-
-class Storage(BaseModel):
+class MovieStorage(BaseModel):
     storage_movie: dict[str, Movie] = {}
 
     def save_state(self):
@@ -37,17 +16,18 @@ class Storage(BaseModel):
         log.info("Saved state to movie storage")
 
     @classmethod
-    def from_state(cls) -> "Storage":
+    def from_state(cls) -> "MovieStorage":
         if not MOVIE_STORAGE_FILEPATH.exists():
-            return Storage()
-        return cls.model_validate(MOVIE_STORAGE_FILEPATH.read_text())
+            log.info("No movie storage file.")
+            return MovieStorage()
+        return cls.model_validate_json(MOVIE_STORAGE_FILEPATH.read_text())
 
-    def init_movie_state(self) -> None:
+    def init_movie_from_state(self) -> None:
         try:
-            movie_data = Storage.from_state()
+            movie_data = MovieStorage().from_state()
             log.warning("Movie storage loaded successfully")
         except ValidationError:
-            movie_storage.save_state()
+            self.save_state()
             log.warning("Movie storage could not be loaded, but we rewriting it")
             return
 
@@ -89,7 +69,7 @@ class Storage(BaseModel):
         return movie
 
 
-movie_storage = Storage()
+movie_storage = MovieStorage()
 
 
 # movie_storage = Storage()

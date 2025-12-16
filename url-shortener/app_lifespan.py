@@ -10,7 +10,7 @@ from api.api_v1.short_urls_api.crud import storage
 async def lifespan(app: FastAPI):
     # действие до запуска приложения
     storage.init_url_storage_from_state()
-    movie_storage.init_movie_state()
+    movie_storage.init_movie_from_state()
     # ставим приложение на паузу
     yield
     # выполняем завершение работы
