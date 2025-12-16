@@ -1,6 +1,7 @@
+import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, BackgroundTasks
 
 from api.api_v1.movies_api.crud import movie_storage
 from api.api_v1.movies_api.dependencies import prefetch_movie
@@ -22,6 +23,8 @@ router = APIRouter(
     },
 )
 
+log = logging.getLogger(__name__)
+
 MovieBySlug = Annotated[Movie, Depends(prefetch_movie)]
 
 
@@ -41,19 +44,25 @@ def get_movie_by_id(
 )
 def delete_movie(
     movie: MovieBySlug,
+    background_tasks: BackgroundTasks,
 ) -> None:
     """При удалении описали дополнительную информацию в документации в responses.
     Статус код при удалении status.HTTP_204_NO_CONTENT!!!
     """
 
     movie_storage.delete_movie(movie)
+    log.info("Save state in movie deleting")
+    background_tasks.add_task(movie_storage.save_state)
 
 
 @router.put("/", response_model=MovieRead)
 def update_movie_by_slug(
     movie: MovieBySlug,
     movie_in: MovieUpdate,
+    background_tasks: BackgroundTasks,
 ) -> Movie:
+    background_tasks.add_task(movie_storage.save_state)
+    log.info("Save state in movie updating")
     return movie_storage.update(movie, movie_in)
 
 
@@ -61,5 +70,8 @@ def update_movie_by_slug(
 def update_movie_by_slug_partial(
     movie: MovieBySlug,
     movie_in: MovieUpdatePartial,
+    background_tasks: BackgroundTasks,
 ) -> Movie:
+    background_tasks.add_task(movie_storage.update_movie, movie, movie_in)
+    log.info("Save state in movie partial updating")
     return movie_storage.update_partial(movie=movie, movie_in=movie_in)
