@@ -72,6 +72,6 @@ def update_movie_by_slug_partial(
     movie_in: MovieUpdatePartial,
     background_tasks: BackgroundTasks,
 ) -> Movie:
-    background_tasks.add_task(movie_storage.update_movie, movie, movie_in)
+    background_tasks.add_task(movie_storage.save_state)
     log.info("Save state in movie partial updating")
     return movie_storage.update_partial(movie=movie, movie_in=movie_in)
